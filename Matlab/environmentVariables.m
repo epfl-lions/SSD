@@ -1,4 +1,4 @@
 function environmentVariables()
-    setenv('MATCONVNET_PATH','/home/ecollins/Utils/matconvnet');
+    setenv('MATCONVNET_PATH','/path/to/matconvnet');
 end
 

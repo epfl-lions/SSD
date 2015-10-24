@@ -4,7 +4,7 @@ This Matlab demo demonstrates the performance of Stochastic Spectral Descent and
 
 To get started:
 
-1)	For experiments with convolutional neural nets, install MatConvNet: http://www.vlfeat.org/matconvnet/
+1)	For experiments with convolutional neural nets, install MatConvNet: http://www.vlfeat.org/matconvnet/ . 
 	Set the path to MatConvNet in the file 'environmentVariables.m'.
 
 2)	Download the MNIST and/or CIFAR10 datasets as specified under the 'data7'.
