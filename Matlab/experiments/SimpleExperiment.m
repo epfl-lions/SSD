@@ -32,15 +32,14 @@ classdef SimpleExperiment < Experiment
         function runExperiment(obj)
             disp(obj.name)
             trainErrors = [];
-            %trainAccuracy = [];
             testAccuracy = [];
-			gd = gpuDevice();
+			if obj.descentOpts.gpu; gd = gpuDevice(); end
             times=[];
             for epoch=obj.descentOpts.initialEpoch:obj.descentOpts.epochs
                 rng(obj.randSeed+epoch,'twister');
 	            tic;
                 trainErrors = [trainErrors  obj.trainEpoch(obj.model,obj.data.train.getIterator(obj.dataChunkSize))'];
-				wait(gd);
+				if obj.descentOpts.gpu; wait(gd); end
 				times=[times;toc];
 %                 trainAccuracy = [trainAccuracy ;obj.evaluate(obj.model,obj.data.train)];
                 testAccuracy = [testAccuracy ; obj.evaluate(obj.model,obj.data.test.getIterator(obj.dataChunkSize))];
