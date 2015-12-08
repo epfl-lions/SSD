@@ -2,7 +2,7 @@
 addpath(genpath('.'));
 close all
 global gpu;
-gpu = true;
+gpu = false;
 
 
 experiment = 'MNIST';

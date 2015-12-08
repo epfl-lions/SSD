@@ -1,5 +1,5 @@
 classdef SimpleExperiment < Experiment
-    properties  
+    properties
         descentOpts;
         results = {};
         duration;
@@ -23,7 +23,7 @@ classdef SimpleExperiment < Experiment
             obj.descentOpts.gpu = false;
             obj.descentOpts.initialEpoch = 1;
             obj.descentOpts.epochs = 10;
-            obj.descentOpts.batchSize = 100;           
+            obj.descentOpts.batchSize = 100;
             obj.optim = optim;
             
         end
@@ -34,20 +34,24 @@ classdef SimpleExperiment < Experiment
             trainErrors = [];
             %trainAccuracy = [];
             testAccuracy = [];
-			gd = gpuDevice();
+            if obj.descentOpts.gpu
+                gd = gpuDevice();
+            end
             times=[];
             for epoch=obj.descentOpts.initialEpoch:obj.descentOpts.epochs
                 rng(obj.randSeed+epoch,'twister');
-	            tic;
+                tic;
                 trainErrors = [trainErrors  obj.trainEpoch(obj.model,obj.data.train.getIterator(obj.dataChunkSize))'];
-				wait(gd);
-				times=[times;toc];
-%                 trainAccuracy = [trainAccuracy ;obj.evaluate(obj.model,obj.data.train)];
+                if obj.descentOpts.gpu
+                    wait(gd);
+                end
+                times=[times;toc];
+                %                 trainAccuracy = [trainAccuracy ;obj.evaluate(obj.model,obj.data.train)];
                 testAccuracy = [testAccuracy ; obj.evaluate(obj.model,obj.data.test.getIterator(obj.dataChunkSize))];
                 if obj.saveInterval > 0 && mod(epoch,obj.saveInterval) == 0
                     obj.save();
                 end
-				
+                
                 if obj.reportEpochInterval > 0 && mod(epoch,obj.reportEpochInterval) == 0
                     fprintf('%s, epoch %d error: %g',obj.name,epoch,mean(trainErrors(:,end)));
                     fprintf(', test set accuracy: %g',testAccuracy(end));
@@ -68,20 +72,20 @@ classdef SimpleExperiment < Experiment
             else
                 obj.results.trainAccuracy = trainAccuracy;
             end
-  
+            
             if isfield(obj.results,'testAccuracy')
                 obj.results.testAccuracy = [obj.results.testAccuracy testAccuracy];
             else
                 obj.results.testAccuracy = testAccuracy;
             end
-
+            
             if isfield(obj.results,'times')
                 obj.results.times = [obj.results.times ; times];
             else
                 obj.results.times = times;
-            end            
+            end
             
-%             obj.results.testAccuracy = obj.evaluate(obj.model,obj.data.test);
+            %             obj.results.testAccuracy = obj.evaluate(obj.model,obj.data.test);
             disp(obj.name)
             fprintf('Training set accuracy: %g\n',obj.results.trainAccuracy);
             fprintf('Test set accuracy: %g\n',obj.results.testAccuracy(end));
@@ -169,7 +173,7 @@ classdef SimpleExperiment < Experiment
         
     end
     methods (Static)
-         function obj = loadobj(sobj)
+        function obj = loadobj(sobj)
             obj = SimpleExperiment(sobj.name,sobj.modelFactory,sobj.data,sobj.optim);
             obj.reload(sobj);
         end
